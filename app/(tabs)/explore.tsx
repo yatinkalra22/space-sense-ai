@@ -3,6 +3,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 
 import { ExternalLink } from '@/components/external-link';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Collapsible } from '@/components/ui/collapsible';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useTheme } from '@/hooks/use-theme';
@@ -31,6 +32,7 @@ export default function TabTwoScreen() {
           }}>
           Explore
         </Text>
+        <ThemeToggle />
       </View>
       <Text style={{ color: colors.text, fontSize: fontSize.base, lineHeight: 24 }}>
         This app includes example code to help you get started.
