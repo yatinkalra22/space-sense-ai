@@ -4,6 +4,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Get started
 
+0. Install [Node.js](https://nodejs.org/en/download) - node v22.21.1 (version used in this project)
+
 1. Install dependencies
 
    ```bash
