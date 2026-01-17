@@ -1,21 +1,62 @@
-import { Link } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
-
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme } from "@/hooks/use-theme";
+import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function ModalScreen() {
-  const { colors, fontSize, fontWeight } = useTheme();
+  const { colors, spacing, fontSize, fontWeight } = useTheme();
+
+  const steps = [
+    { icon: "camera", title: "Scan", desc: "Take a photo of your room." },
+    {
+      icon: "scan",
+      title: "Diagnose",
+      desc: "AI identifies layout & lighting issues.",
+    },
+    {
+      icon: "color-wand",
+      title: "Fix",
+      desc: "Get a visual prescription to solve it.",
+    },
+  ];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={{ color: colors.text, fontSize: fontSize['4xl'], fontWeight: fontWeight.bold }}>
-        This is a modal
+      <Text
+        style={{
+          fontSize: fontSize["2xl"],
+          fontWeight: fontWeight.bold,
+          color: colors.text,
+          marginBottom: spacing.xl,
+        }}
+      >
+        How VibeFix Works
       </Text>
-      <Link href="/" dismissTo style={styles.link}>
-        <Text style={{ color: colors.primary, fontSize: fontSize.base, lineHeight: 30 }}>
-          Go to home screen
-        </Text>
-      </Link>
+
+      {steps.map((step, index) => (
+        <View key={index} style={styles.stepRow}>
+          <View
+            style={[styles.iconBox, { backgroundColor: colors.primary + "20" }]}
+          >
+            <Ionicons
+              name={step.icon as any}
+              size={24}
+              color={colors.primary}
+            />
+          </View>
+          <View>
+            <Text
+              style={{
+                fontSize: fontSize.lg,
+                fontWeight: fontWeight.semibold,
+                color: colors.text,
+              }}
+            >
+              {step.title}
+            </Text>
+            <Text style={{ color: colors.textSecondary }}>{step.desc}</Text>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
@@ -23,12 +64,19 @@ export default function ModalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    padding: 24,
   },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
+  stepRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  iconBox: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
   },
 });

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "space-sense-ai",
-    "slug": "space-sense-ai",
+    "slug": "vibefix",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.spacesenseai"
     },
     "web": {
       "output": "static",
@@ -44,6 +45,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "bc06bfdd-72d7-42f0-a4c6-34d9fcd02fda"
+      }
+    },
+    "owner": "sane9"
   }
 }

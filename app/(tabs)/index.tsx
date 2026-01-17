@@ -1,109 +1,142 @@
-import { Image } from 'expo-image';
-import { Link } from 'expo-router';
-import { Platform, StyleSheet, Text, View } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { useTheme } from '@/hooks/use-theme';
+import { LoadingOverlay } from "@/components/loadingoverlay";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Button } from "../../components/ui/button";
+import { Preview } from "../../components/ui/preview";
+import { useTheme } from "../../hooks/use-theme";
 
 export default function HomeScreen() {
-  const { colors, fontSize, fontWeight } = useTheme();
+  const { colors, spacing, fontSize, fontWeight } = useTheme();
+
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState("");
+
+  const pickImage = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+    if (!res.canceled) setImageUri(res.assets[0].uri);
+  };
+
+  const handleDiagnosis = async () => {
+    if (!imageUri)
+      return Alert.alert("Missing Scan", "Please scan a room first.");
+
+    setIsLoading(true);
+    try {
+      setStatus("Uploading scan...");
+      // await uploadImage(imageUri); // Uncomment when Firebase is live
+
+      setStatus("Analyzing geometry...");
+      await new Promise((r) => setTimeout(r, 1000));
+
+      setStatus("Diagnosing vibe...");
+      await new Promise((r) => setTimeout(r, 1000));
+
+      router.push({
+        pathname: "/diagnosis/[id]",
+        params: { id: Date.now().toString(), uri: imageUri },
+      });
+    } catch (error) {
+      Alert.alert("Error", "Analysis failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <View style={[styles.titleContainer, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.text, fontSize: fontSize['4xl'], fontWeight: fontWeight.bold }}>
-          Welcome!
-        </Text>
-        <HelloWave />
-        <ThemeToggle />
-      </View>
-      <View style={[styles.stepContainer, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.text, fontSize: fontSize.xl, fontWeight: fontWeight.bold }}>
-          Step 1: Try it
-        </Text>
-        <Text style={{ color: colors.text, fontSize: fontSize.base, lineHeight: 24 }}>
-          Edit <Text style={{ fontWeight: fontWeight.semibold }}>app/(tabs)/index.tsx</Text> to see changes.
-          Press{' '}
-          <Text style={{ fontWeight: fontWeight.semibold }}>
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </Text>{' '}
-          to open developer tools.
-        </Text>
-      </View>
-      <View style={[styles.stepContainer, { backgroundColor: colors.background }]}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <Text style={{ color: colors.text, fontSize: fontSize.xl, fontWeight: fontWeight.bold }}>
-              Step 2: Explore
-            </Text>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={{ padding: spacing.lg, paddingBottom: 100 }}
+    >
+      <LoadingOverlay visible={isLoading} message={status} />
 
-        <Text style={{ color: colors.text, fontSize: fontSize.base, lineHeight: 24 }}>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </Text>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <View>
+          <Text
+            style={{
+              fontSize: fontSize["3xl"],
+              fontWeight: fontWeight.bold,
+              color: colors.text,
+            }}
+          >
+            VibeFix AI
+          </Text>
+          <Text
+            style={{
+              fontSize: fontSize.base,
+              color: colors.textSecondary,
+              marginTop: 4,
+            }}
+          >
+            AI-Powered Interior Diagnosis
+          </Text>
+        </View>
+        <Link href="/modal" asChild>
+          <Ionicons
+            name="help-circle-outline"
+            size={28}
+            color={colors.primary}
+          />
+        </Link>
       </View>
-      <View style={[styles.stepContainer, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.text, fontSize: fontSize.xl, fontWeight: fontWeight.bold }}>
-          Step 3: Get a fresh start
-        </Text>
-        <Text style={{ color: colors.text, fontSize: fontSize.base, lineHeight: 24 }}>
-          {`When you're ready, run `}
-          <Text style={{ fontWeight: fontWeight.semibold }}>npm run reset-project</Text> to get a fresh{' '}
-          <Text style={{ fontWeight: fontWeight.semibold }}>app</Text> directory. This will move the current{' '}
-          <Text style={{ fontWeight: fontWeight.semibold }}>app</Text> to{' '}
-          <Text style={{ fontWeight: fontWeight.semibold }}>app-example</Text>.
-        </Text>
+
+      <View style={{ height: spacing.xl }} />
+
+      {/* Main Preview Area */}
+      <Preview imageUri={imageUri} />
+
+      <View style={{ gap: spacing.md, marginTop: spacing.xl }}>
+        {!imageUri ? (
+          <>
+            <Button
+              title="Select Room Photo"
+              onPress={pickImage}
+              icon="images"
+              style={{ height: 56 }}
+            />
+            <Text
+              style={{
+                textAlign: "center",
+                color: colors.textTertiary,
+                fontSize: fontSize.sm,
+              }}
+            >
+              Supports JPG, PNG • Max 10MB
+            </Text>
+          </>
+        ) : (
+          <>
+            <Button
+              title="Run Diagnosis"
+              onPress={handleDiagnosis}
+              variant="primary"
+              style={{ height: 56 }}
+            />
+            <Button
+              title="Choose Different Photo"
+              onPress={pickImage}
+              variant="outline"
+            />
+          </>
+        )}
       </View>
-    </ParallaxScrollView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
   },
 });
