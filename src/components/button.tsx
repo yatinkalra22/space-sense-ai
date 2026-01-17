@@ -22,15 +22,15 @@ export const Button = ({
 }: Props) => {
   
   const getBackgroundColor = () => {
-    if (variant === 'secondary') return COLORS.secondary;
+    if (variant === 'secondary') return COLORS.accent;
     if (variant === 'outline') return 'transparent';
     return COLORS.primary;
   };
 
   const getTextColor = () => {
-    if (variant === 'secondary') return COLORS.text;
+    if (variant === 'secondary') return COLORS.textMain;
     if (variant === 'outline') return COLORS.primary;
-    return COLORS.white;
+    return COLORS.textMain;
   };
 
   return (
@@ -56,7 +56,7 @@ export const Button = ({
               name={icon} 
               size={20} 
               color={getTextColor()} 
-              style={{ marginRight: SPACING.s }} 
+              style={{ marginRight: SPACING.small }} 
             />
           )}
           <Text style={[styles.text, { color: getTextColor() }]}>
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: SPACING.l,
+    paddingHorizontal: SPACING.large,
     width: '100%',
   },
   text: {
