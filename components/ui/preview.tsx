@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import { COLORS } from "../constants/theme";
+import { COLORS } from "../../constants/theme";
 
 export const Preview = ({ imageUri }: { imageUri: string | null }) => {
   if (!imageUri) {
