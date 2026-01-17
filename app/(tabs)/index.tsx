@@ -3,8 +3,8 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { Preview } from "../../components/preview";
-import { COLORS } from "../../src/constants/theme";
-import { mockUploadFile } from "../services/fileService";
+import { COLORS } from "../../constants/theme";
+import { mockUploadFile } from "../../services/fileService";
 
 export default function Screen() {
   const [imageUri, setImageUri] = useState<string | null>(null);
