@@ -1,15 +1,15 @@
-import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { ThemeProvider, useThemeContext } from "@/contexts/theme-context";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavThemeProvider,
+} from "@react-navigation/native";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import "react-native-reanimated";
+import { theme } from "../constants/theme";
 
-import { theme } from '@/constants/theme';
-import { ThemeProvider, useThemeContext } from '@/contexts/theme-context';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
+// Mapping custom theme
 const CustomLightTheme = {
   ...DefaultTheme,
   colors: {
@@ -38,14 +38,31 @@ const CustomDarkTheme = {
 
 function RootLayoutNav() {
   const { activeTheme } = useThemeContext();
+  const isDark = activeTheme === "dark";
 
   return (
-    <NavThemeProvider value={activeTheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
+    <NavThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        <Stack.Screen
+          name="diagnosis/[id]"
+          options={{
+            title: "Diagnosis",
+            headerBackTitle: "Back",
+            headerTintColor: isDark
+              ? theme.colors.dark.primary
+              : theme.colors.light.primary,
+          }}
+        />
+        <Stack.Screen
+          name="modal"
+          options={{
+            presentation: "modal",
+            title: "How it Works",
+          }}
+        />
       </Stack>
-      <StatusBar style={activeTheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={isDark ? "light" : "dark"} />
     </NavThemeProvider>
   );
 }

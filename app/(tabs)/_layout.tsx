@@ -1,36 +1,41 @@
-import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useTheme } from "@/hooks/use-theme";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
-  const { colors, spacing, isDark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: "gray",
+        tabBarInactiveTintColor: colors.icon,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          height: Platform.OS === "android" ? 60 : 88,
+          paddingBottom: Platform.OS === "android" ? 10 : 30,
+        },
         headerShown: false,
-        tabBarButton: HapticTab,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          title: "Scan",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="scan-circle" size={size + 4} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="history"
         options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+          title: "History",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="time-outline" size={size} color={color} />
           ),
         }}
       />

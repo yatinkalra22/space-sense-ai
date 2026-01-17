@@ -1,56 +1,50 @@
 import { LoadingOverlay } from "@/components/loadingoverlay";
-import { Button } from "@/components/ui/button";
-import { Preview } from "@/components/ui/preview";
-import { uploadImage } from "@/services/fileService";
+import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
-import { theme } from "../../constants/theme";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Button } from "../../components/ui/button";
+import { Preview } from "../../components/ui/preview";
+import { useTheme } from "../../hooks/use-theme";
 
-export default function Screen() {
+export default function HomeScreen() {
+  const { colors, spacing, fontSize, fontWeight } = useTheme();
+
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  const t = theme.colors.light; // Using light theme for now
-
   const pickImage = async () => {
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
     });
     if (!res.canceled) setImageUri(res.assets[0].uri);
   };
 
   const handleDiagnosis = async () => {
     if (!imageUri)
-      return Alert.alert("Missing Scan", "Please scan the room first.");
+      return Alert.alert("Missing Scan", "Please scan a room first.");
 
     setIsLoading(true);
-
     try {
       setStatus("Uploading scan...");
-      // 1. Upload to Firebase
-      const downloadUrl = await uploadImage(imageUri);
+      // await uploadImage(imageUri); // Uncomment when Firebase is live
 
       setStatus("Analyzing geometry...");
-      // 2. Here you would call your AI Cloud Function with downloadUrl
-      await new Promise((r) => setTimeout(r, 1500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       setStatus("Diagnosing vibe...");
       await new Promise((r) => setTimeout(r, 1000));
 
-      // 3. Navigate
       router.push({
-        pathname: "/diagnosis/123",
-        params: { uri: imageUri },
+        pathname: "/diagnosis/[id]",
+        params: { id: Date.now().toString(), uri: imageUri },
       });
     } catch (error) {
-      console.error(error);
-      Alert.alert(
-        "Error",
-        "Could not analyze room. Please check your connection."
-      );
+      Alert.alert("Error", "Analysis failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -58,56 +52,76 @@ export default function Screen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: t.background }}
-      contentContainerStyle={{ padding: theme.spacing.lg }}
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={{ padding: spacing.lg, paddingBottom: 100 }}
     >
       <LoadingOverlay visible={isLoading} message={status} />
 
-      <View
-        style={{
-          marginTop: theme.spacing["2xl"],
-          marginBottom: theme.spacing.lg,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: theme.fontSize["4xl"],
-            fontWeight: theme.fontWeight.bold,
-            color: t.text,
-          }}
-        >
-          VibeFix AI
-        </Text>
-        <Text
-          style={{
-            fontSize: theme.fontSize.lg,
-            color: t.textSecondary,
-            marginTop: theme.spacing.sm,
-          }}
-        >
-          Don't just restyle.{" "}
-          <Text style={{ color: t.primary, fontWeight: theme.fontWeight.bold }}>
-            Diagnose.
+      {/* Header Section */}
+      <View style={styles.header}>
+        <View>
+          <Text
+            style={{
+              fontSize: fontSize["3xl"],
+              fontWeight: fontWeight.bold,
+              color: colors.text,
+            }}
+          >
+            VibeFix AI
           </Text>
-        </Text>
+          <Text
+            style={{
+              fontSize: fontSize.base,
+              color: colors.textSecondary,
+              marginTop: 4,
+            }}
+          >
+            AI-Powered Interior Diagnosis
+          </Text>
+        </View>
+        <Link href="/modal" asChild>
+          <Ionicons
+            name="help-circle-outline"
+            size={28}
+            color={colors.primary}
+          />
+        </Link>
       </View>
 
-      {/* Preview Component needs to be updated to accept styles if needed, 
-          but works as is if it uses standard views */}
+      <View style={{ height: spacing.xl }} />
+
+      {/* Main Preview Area */}
       <Preview imageUri={imageUri} />
 
-      <View style={{ gap: theme.spacing.md, marginTop: theme.spacing.xl }}>
+      <View style={{ gap: spacing.md, marginTop: spacing.xl }}>
         {!imageUri ? (
-          <Button title="Scan Room" onPress={pickImage} icon="camera" />
+          <>
+            <Button
+              title="Select Room Photo"
+              onPress={pickImage}
+              icon="images"
+              style={{ height: 56 }}
+            />
+            <Text
+              style={{
+                textAlign: "center",
+                color: colors.textTertiary,
+                fontSize: fontSize.sm,
+              }}
+            >
+              Supports JPG, PNG • Max 10MB
+            </Text>
+          </>
         ) : (
           <>
             <Button
-              title="Run Vibe Diagnosis"
+              title="Run Diagnosis"
               onPress={handleDiagnosis}
               variant="primary"
+              style={{ height: 56 }}
             />
             <Button
-              title="Retake Photo"
+              title="Choose Different Photo"
               onPress={pickImage}
               variant="outline"
             />
@@ -117,3 +131,12 @@ export default function Screen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+  },
+});
